@@ -1,18 +1,33 @@
+# aplikacja w trypie bez niezaleznym
+
+# lokalna sciezka do plikow bazy danych 
+#kat = 'storage/emulated/0/OziExpolrer/Data'
+
+# FTP host
+#piterbikHost = ''
+
+# kodowanie
+#encout = 'utf8'
+# ----------------------------------------------------------
+
 import datetime
 import os, re
 import time
 import sqlite3
 import sys
-from katalogi import kat, podkat, folder
-from katalogi import encin
 from ftplib import FTP
-from connectMySql import piterbikHost
 
 import androidhelper
+
+# aplikacja w trypie zaleznym od zmiennych we wspoldzielonych plikach
+from katalogi import kat, encout
+from connectMySql import piterbikHost
+# ----------------------------------------------------------
 
 droid = androidhelper.Android()
 
 SZERPOLA = 100
+PROBY_GPS = 8
 
 pliksql = 'inwent.sql'        # plik skryptu SQL tworzenia struktury bazy
 pliksqlite = 'inwent.sqlite'  # plik wynikowy bazy danych
@@ -50,6 +65,7 @@ def mainAppMenu(db):
         'Drzewo-',
         'Zinwentaryzowano',
         'FTP wysylka', 
+        'Reset', 
         'Wyjscie'
     ]
 
@@ -65,13 +81,15 @@ def mainAppMenu(db):
     elif wybor == 4:
             ftp_operation()
     elif wybor == 5:
+            reset_db(db, filename)
+    elif wybor == 6:
             quit(db)
 
 
 def main():
 
     # otwieranie pliku skryptu z zapytaniami
-    fd = open(filename2, 'r', encoding=encin)
+    fd = open(filename2, 'r', encoding=encout)
     sqlFile = fd.read()
     fd.close()
 
@@ -119,6 +137,7 @@ def connect(filename, utworzenie):
                 print ('Polecenie odrzucone: ', msgerr)
             else:
                 print('Zapytanie:' + command[0:50] + '\n\twykonano z powodzeniem\n')
+        print('Koniec transakcji')
         db.commit()
     return db
 
@@ -196,35 +215,42 @@ def add_tree(db):
 
         lokalizacjaArr = getPosition()
 
-        jeden = float(lokalizacjaArr[0]) 
-        cztery = float(lokalizacjaArr[1])  
-        punkt = (lokalizacjaArr[0] + ' ' + lokalizacjaArr[1])
-
-        nrDrzewa = 'Drzewo {}: {}'.format(i, punkt)
-        srednica130 = numberItem(nrDrzewa, 'Srednica 130 [cm]')
-        srednica10 = numberItem(nrDrzewa, 'Srednica 10 [cm]')
-        wysokosc = numberItem(nrDrzewa, 'Wysokosc [m]', wysoko)
-        obwod130 = numberItem(nrDrzewa, 'Obwod 130 [cm]', wysoko)
-        obwod10 = numberItem(nrDrzewa, 'Obwod 10 [cm]', wysoko)
- 
-        cursor = db.cursor()
-
-        sql = ("""insert into INW_PJ_DRZEWA (ID, POMIAR_ID, GATUNEK, SREDNICA_130, SREDNICA_10, WYSOKOSC, OBWOD_130, OBWOD_10, LOC_X, LOC_Y) 
-                    values (NULL, %d, '%s', %d, %d, %d, %d, %d, %f, %f);""") % \
-                (pomiarz, gatunekz, srednica130, srednica10, wysokosc, obwod130, obwod10, jeden, cztery)
-
-        try:
-            cursor.execute(sql)
-            db.commit()
-        except Exception as p:
-            droid.dialogCreateAlert('Blad dodania rekordu', p)
-
-        else:
-            droid.dialogCreateAlert('Dodano drzewo', '{} ({})'.format(gatunekz, srednica130))
-        
-        finally:
+        if not lokalizacjaArr:
+            droid.dialogCreateAlert('GPS Error')
             droid.dialogShow()
             time.sleep(2)
+            quit(db)
+
+        else:
+            jeden = float(lokalizacjaArr[0]) 
+            cztery = float(lokalizacjaArr[1])  
+            punkt = (lokalizacjaArr[0] + ' ' + lokalizacjaArr[1])
+
+            nrDrzewa = 'Drzewo {}: {}'.format(i, punkt)
+            srednica130 = numberItem(nrDrzewa, 'Srednica 130 [cm]')
+            srednica10 = numberItem(nrDrzewa, 'Srednica 10 [cm]')
+            wysokosc = numberItem(nrDrzewa, 'Wysokosc [m]', wysoko)
+            obwod130 = numberItem(nrDrzewa, 'Obwod 130 [cm]', wysoko)
+            obwod10 = numberItem(nrDrzewa, 'Obwod 10 [cm]', wysoko)
+ 
+            cursor = db.cursor()
+
+            sql = ("""insert into INW_PJ_DRZEWA (ID, POMIAR_ID, GATUNEK, SREDNICA_130, SREDNICA_10, WYSOKOSC, OBWOD_130, OBWOD_10, LOC_X, LOC_Y) 
+                        values (NULL, %d, '%s', %d, %d, %d, %d, %d, %f, %f);""") % \
+                    (pomiarz, gatunekz, srednica130, srednica10, wysokosc, obwod130, obwod10, jeden, cztery)
+
+            try:
+                cursor.execute(sql)
+                db.commit()
+            except Exception as p:
+                droid.dialogCreateAlert('Blad dodania rekordu', p)
+
+            else:
+                droid.dialogCreateAlert('Dodano drzewo', '{} ({})'.format(gatunekz, srednica130))
+        
+            finally:
+                droid.dialogShow()
+                time.sleep(2)
         
     mainAppMenu(db)
  
@@ -293,6 +319,19 @@ def lista_punktow(db):
         mainAppMenu(db)
 
 
+def reset_db(db, plik):
+    if db is not None:
+        db.close()
+
+    os.remove(plik)
+
+    droid.clearContextMenu()
+    droid.clearOptionsMenu()
+    droid.dialogDismiss()
+
+    main()
+
+
 def quit(db):
     if db is not None:
         count = pomiary_count(db)
@@ -308,7 +347,7 @@ def ftp_conn():
     ftp = None
     try:
         ftp = FTP(piterbikHost)
-        loginFtp = 'lokal@{}'.format(piterbikHost) #atolgeo
+        loginFtp = 'lokal@{}'.format(piterbikHost) 
         droid.dialogGetPassword('Haslo FTP')
         passFtp=droid.dialogGetResponse().result['value']
         ftp.login(loginFtp, passFtp)
@@ -340,11 +379,13 @@ def ftp_operation():
 
 def getPosition():
 
-    licznik=0
+    licznikOgolny=0
+    licznikGps=0
     koordArr = []
 
     droid.startLocating(5000, 1)
     while True:
+        licznikOgolny=licznikOgolny+1
         locat = droid.readLocation()
         if 'gps' in locat.result:
             try:
@@ -356,12 +397,12 @@ def getPosition():
                 print ('Failure: ', p)
             else:
 
-                licznik = licznik+1
-                if licznik==4:
+                licznikGps = licznikGps+1
+                if licznikGps==4:
                     koordArr.append(lat[:11])
                     koordArr.append(lon[:11])
                     koordArr.append(wysoko[:4])
-                    koordArr.append(licznik)
+                    koordArr.append(licznikGps)
 
                     droid.stopLocating()
                     droid.dialogDismiss()
@@ -369,8 +410,11 @@ def getPosition():
                     return koordArr
 
         else:
-            droid.dialogCreateSpinnerProgress('Waiting for GPS signal...','Progress')
-            droid.dialogShow()
+            if licznikOgolny==PROBY_GPS:
+                return False
+            else:
+                droid.dialogCreateSpinnerProgress('Waiting for GPS signal...','Progress')
+                droid.dialogShow()
         
         time.sleep(0.8)
 
