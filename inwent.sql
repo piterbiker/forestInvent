@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS "INW_PJ_GATUNKI" (
 	"NAZWA_PL"	TEXT NOT NULL,
 	"NAZWA_LAC"	TEXT,
 	"IGLASTE"	INTEGER NOT NULL DEFAULT 0 CHECK("IGLASTE" IN (0, 1, 2)),
+	"GRUPA" TEXT NOT NULL, 
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "INW_PJ_KLASY_GR" (
@@ -24,6 +25,13 @@ CREATE TABLE IF NOT EXISTS "INW_PJ_KLASY_GR" (
 	"MAX"	INTEGER NOT NULL,
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
+CREATE TABLE IF NOT EXISTS "INW_PJ_TYPY_LASU"  (
+	"ID" INTEGER NOT NULL, 
+	"SKROT" TEXT NOT NULL UNIQUE, 
+	"RODZAJ" TEXT NOT NULL CHECK ("RODZAJ" in ('N', 'W', 'G')), 
+	"OPIS" TEXT NOT NULL, 
+	PRIMARY KEY("ID" AUTOINCREMENT)	 
+   );
 CREATE TABLE IF NOT EXISTS "INW_PJ_POMIARY" (
 	"ID"	INTEGER NOT NULL,
 	"NUMER_DZ"	TEXT NOT NULL UNIQUE,
@@ -35,8 +43,10 @@ CREATE TABLE IF NOT EXISTS "INW_PJ_POMIARY" (
 	"OZK"	TEXT,
 	"CREATED_BY"	TEXT NOT NULL DEFAULT USER,
 	"CREATED_DATE"	DATE NOT NULL DEFAULT SYSDATE,
+	"TYP_LASU" TEXT, 
 	FOREIGN KEY("OZU") REFERENCES "EGB_OZUTYPES"("ENUMERATION"),
 	FOREIGN KEY("OZK") REFERENCES "EGB_OZKTYPES"("ENUMERATION"),
+	FOREIGN KEY("TYP_LASU") REFERENCES "INW_PJ_TYPY_LASU"("SKROT"),
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
 CREATE TABLE IF NOT EXISTS "INW_PJ_DRZEWA" (
@@ -55,6 +65,27 @@ CREATE TABLE IF NOT EXISTS "INW_PJ_DRZEWA" (
 	FOREIGN KEY("GATUNEK") REFERENCES "INW_PJ_GATUNKI"("SKROT"),
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('1','BMwyż','W','Bór mieszany wyżynny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('2','LMwyż','W','Las mieszany wyżynny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('3','Lwyż','W','Las wyżynny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('4','BG','G','Bór górski');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('5','BMG','G','Bór mieszany górski');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('6','LMG','G','Las mieszany górski');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('7','LG','G','Las górski');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('8','LłG','G','Las łęgowy górski');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('9','Bs','N','Bór suchy');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('10','Bśw','N','Bór świeży');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('11','Bw','N','Bór wilgotny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('12','Bb','N','Bór bagienny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('13','BMb','N','Bór mieszany bagienny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('14','BMw','N','Bór mieszany wilgotny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('15','BMśw','N','Bór mieszany świeży');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('16','LMb','N','Las mieszany bagienny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('17','LMw','N','Las mieszany wilgotny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('18','LMśw','N','Las mieszany świeży');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('19','Ol','N','Ols');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('20','Lw','N','Las wilgotny');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('21','Lśw','N','Las świeży');
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('I',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('II',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('III',NULL);
@@ -66,29 +97,45 @@ INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('IVb',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('V',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('VI',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('VIz',NULL);
-
 INSERT INTO "EGB_OZUTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('R','gruntOrny');
 INSERT INTO "EGB_OZUTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('L','lakaTrwala');
 INSERT INTO "EGB_OZUTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('Ps','pastwiskoTrwale');
 INSERT INTO "EGB_OZUTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('Ls','Las');
 INSERT INTO "EGB_OZUTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('Lz','gruntZadrzewionyIZakrzewiony');
-
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (1,'Św','Swierk pospolity','Picea abies',1);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (2,'Jd','Jodla pospolita','Abies alba',1);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (3,'Bk','Buk zwyczajny','Fagus sylvatica',0);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (4,'So','Sosna zwyczajna','Pinus sylvestris',1);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (5,'Db2','Dab bezszypulkowy','Quercus petraea',0);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (6,'Db1','Dab szypulkowy','Quercus robur',0);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (7,'Jw','Klon jawor','Acer pseudoplatanus',0);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (8,'Brz','Brzoza brodawkowata','Betula pendula',0);
-INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE") VALUES (9,'Md','Modrzew europejski','Larix decidua',1);
-
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('1','Sw','Swierk pospolity','Picea abies','1','Sw');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('2','Jd','Jodla pospolita','Abies alba','1','Jd');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('3','Bk','Buk zwyczajny','Fagus sylvatica','0','Bk');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('4','So','Sosna zwyczajna','Pinus sylvestris','1','So');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('5','Dbb','Dab bezszypulkowy','Quercus petraea','0','Db');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('6','Dbs','Dab szypulkowy','Quercus robur','0','Db');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('7','Jw','Klon jawor','Acer pseudoplatanus','0','Jw');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('8','Brz','Brzoza brodawkowata','Betula pendula','0','Brz');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('9','Md','Modrzew europejski','Larix decidua','1','Md');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('10','Gb','Grab pospolity','Carpinus betulus','0','Gb');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('11','Olcz','Olsza czarna','Alnus glutinosa','0','Ol');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('12','Olsz','Olsza szara','Alnus incana','0','Ol');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('13','Tpc','Topola czarna','Populus nigra','0','Tp');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('14','Tpb','Topola biala','Populus alba','0','Tp');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('15','Os','Topola osika','Populus tremula','0','Os');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('16','Lpd','Lipa drobnolistna','Tilia cordata','0','Lp');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('17','Lps','Lipa szerokolistna','Tilia platyphyllos','0','Lp');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('18','Wz','Wiaz pospolity','Ulmus minor','0','Wz');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('19','Kl','Klon zwyczajny','Acer platanoides','0','Kl');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('20','Js','Jesion wyniosly','Fraxinus excelsior','0','Js');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('21','Jrz','Jarzab pospolity','Sorbus aucuparia','0','Jrz');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('22','PI','Pozostale iglaste',null,'2','PI');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('23','PL','Pozostale lisciaste',null,'2','PL');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('24','Dg','Daglezja zielona','Pseudotsuga menziesii','1','Dg');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('25','Lb','Sosna limba','Pinus cembra','1','Lb');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('26','Dbc','Dab czerwony','Quercus rubra','0','Db');
+INSERT INTO "INW_PJ_GATUNKI" ("ID","SKROT","NAZWA_PL","NAZWA_LAC","IGLASTE","GRUPA") values ('27','Soc','Sosna czarna','Pinus nigra','1','So');
 INSERT INTO "INW_PJ_KLASY_GR" ("ID","KLASA","MIN","MAX") VALUES (1,'I',7,15);
 INSERT INTO "INW_PJ_KLASY_GR" ("ID","KLASA","MIN","MAX") VALUES (2,'II',16,35);
 INSERT INTO "INW_PJ_KLASY_GR" ("ID","KLASA","MIN","MAX") VALUES (3,'III',36,55);
 INSERT INTO "INW_PJ_KLASY_GR" ("ID","KLASA","MIN","MAX") VALUES (4,'IV',56,75);
 INSERT INTO "INW_PJ_KLASY_GR" ("ID","KLASA","MIN","MAX") VALUES (5,'V',76,95);
-
+INSERT INTO "INW_PJ_POMIARY" ("ID","NUMER_DZ","ODDZIAL","LOKALIZACJA","JEDN_REJESTROWA","ADRES_LESNY","OZU","OZK","CREATED_BY","CREATED_DATE") VALUES (1,'241710_2.0003.3993','3ly','Juszczyna','G913','S171020003-103-ly-00','Ls','IV','PJARCZAK','2022-01-25');
+INSERT INTO "INW_PJ_POMIARY" ("ID","NUMER_DZ","ODDZIAL","LOKALIZACJA","JEDN_REJESTROWA","ADRES_LESNY","OZU","OZK","CREATED_BY","CREATED_DATE") VALUES (6,'241704_2.0003.1542',NULL,'Krzyżowa',NULL,NULL,'Ls',NULL,'PJARCZAK','2022-01-25');
 CREATE UNIQUE INDEX IF NOT EXISTS "EGB_OZKTYPES_PK" ON "EGB_OZKTYPES" (
 	"ENUMERATION"
 );
@@ -129,9 +176,11 @@ CREATE VIEW INW_PJ_POMIARY_DEV_V AS
  p.ODDZIAL, 
  p.JEDN_REJESTROWA, 
  p.ADRES_LESNY, 
+ p.TYP_LASU,  
  p.OZU || IFNULL(p.OZK, '') as UZYTEK, 
  o.DESCRIPTION as OZU, 
  d.GATUNEK,
+ g.GRUPA, 
  g.NAZWA_PL, 
  g.NAZWA_LAC, 
  g.IGLASTE, 
