@@ -15,7 +15,7 @@ import os, re
 import time
 import sqlite3
 import sys
-from ftplib import FTP
+import ftplib
 
 import androidhelper
 
@@ -27,7 +27,7 @@ from connectMySql import piterbikHost
 droid = androidhelper.Android()
 
 SZERPOLA = 100
-PROBY_GPS = 8
+PROBY_GPS = 10
 
 pliksql = 'inwent.sql'        # plik skryptu SQL tworzenia struktury bazy
 pliksqlite = 'inwent.sqlite'  # plik wynikowy bazy danych
@@ -167,7 +167,7 @@ def add_pomiar(db):
         db.commit()
 
     except Exception as p:
-        droid.dialogCreateAlert('Blad dodania rekordu',p)
+        droid.dialogCreateAlert('Blad dodania rekordu', "%s" % p)
 
     else:
         droid.dialogCreateAlert('Dodano pomiar dla dzialki', '{} ({})'.format(dzialka, lokalizacja))
@@ -222,28 +222,31 @@ def add_tree(db):
             quit(db)
 
         else:
-            jeden = float(lokalizacjaArr[0]) 
-            cztery = float(lokalizacjaArr[1])  
+            longt = float(lokalizacjaArr[0]) 
+            latt = float(lokalizacjaArr[1])  
+            altt = int(lokalizacjaArr[2])  
             punkt = (lokalizacjaArr[0] + ' ' + lokalizacjaArr[1])
 
             nrDrzewa = 'Drzewo {}: {}'.format(i, punkt)
             srednica130 = numberItem(nrDrzewa, 'Srednica 130 [cm]')
-            srednica10 = numberItem(nrDrzewa, 'Srednica 10 [cm]')
+            srednica10 = numberItem(nrDrzewa, 'Srednica 10 [cm]', wysoko)
             wysokosc = numberItem(nrDrzewa, 'Wysokosc [m]', wysoko)
             obwod130 = numberItem(nrDrzewa, 'Obwod 130 [cm]', wysoko)
             obwod10 = numberItem(nrDrzewa, 'Obwod 10 [cm]', wysoko)
+
+            uwagi = droid.dialogGetInput(nrDrzewa, 'Uwagi').result
  
             cursor = db.cursor()
 
-            sql = ("""insert into INW_PJ_DRZEWA (ID, POMIAR_ID, GATUNEK, SREDNICA_130, SREDNICA_10, WYSOKOSC, OBWOD_130, OBWOD_10, LOC_X, LOC_Y) 
-                        values (NULL, %d, '%s', %d, %d, %d, %d, %d, %f, %f);""") % \
-                    (pomiarz, gatunekz, srednica130, srednica10, wysokosc, obwod130, obwod10, jeden, cztery)
+            sql = ("""insert into INW_PJ_DRZEWA (ID, POMIAR_ID, GATUNEK, SREDNICA_130, SREDNICA_10, WYSOKOSC, OBWOD_130, OBWOD_10, LOC_X, LOC_Y, LOC_Z, UWAGI) 
+                        values (NULL, %d, '%s', %d, %d, %d, %d, %d, %.8f, %.8f, %d, '%s');""") % \
+                    (pomiarz, gatunekz, srednica130, srednica10, wysokosc, obwod130, obwod10, longt, latt, altt, uwagi)
 
             try:
                 cursor.execute(sql)
                 db.commit()
             except Exception as p:
-                droid.dialogCreateAlert('Blad dodania rekordu', p)
+                droid.dialogCreateAlert('Blad dodania rekordu', "%s" % p)
 
             else:
                 droid.dialogCreateAlert('Dodano drzewo', '{} ({})'.format(gatunekz, srednica130))
@@ -299,7 +302,6 @@ def pomiary_count(db):
     return cursor.fetchone()[0]
 
 
-# TODO
 def lista_punktow(db):
     cursor = db.cursor()
     sql = ("select NUMER_DZ, LOKALIZACJA, UZYTEK, GATUNEK, SREDNICA_130, SREDNICA_10, WKT from INW_PJ_POMIARY_DEV_V where CREATED_DATE=CURRENT_DATE order by NUMER_DZ, GATUNEK")
@@ -346,25 +348,30 @@ def quit(db):
 def ftp_conn():
     ftp = None
     try:
-        ftp = FTP(piterbikHost)
-        loginFtp = 'lokal@{}'.format(piterbikHost) 
-        droid.dialogGetPassword('Haslo FTP')
-        passFtp=droid.dialogGetResponse().result['value']
-        ftp.login(loginFtp, passFtp)
-    except Exception as g:
-        droid.dialogCreateAlert('Blad polaczenia FTP', g)
+        ftp = ftplib.FTP(piterbikHost)
+    except ftplib.all_errors as e:
+        droid.dialogCreateAlert('Blad polaczenia FTP', "%s" % e)
+        time.sleep(2)
+        sys.exit
     else:
-        return ftp
+        try:
+            loginFtp = 'lokal@{}'.format(piterbikHost) 
+            droid.dialogGetPassword('Haslo FTP')
+            passFtp=droid.dialogGetResponse().result['value']
+            ftp.login(loginFtp, passFtp)
+        except ftplib.all_errors as f:
+            droid.dialogCreateAlert('Blad uwierzytelnienia FTP', "%s" % f)
+        else:
+            return ftp
 
 
 def ftp_operation():
     openSqLiteOut = open(filename, "rb")
-    ftp = None
+    ftp = ftp_conn()
     try:
-        ftp = ftp_conn()
         wysylka = ftp.storbinary('STOR ' + pliksqlite, openSqLiteOut)
-    except Exception as g:
-        droid.dialogCreateAlert('Blad wysylki FTP', g)
+    except ftplib.all_errors as g:
+        droid.dialogCreateAlert('Blad wysylki FTP', "%s" % g)
     else:
         droid.dialogCreateAlert(wysylka)
     
@@ -389,9 +396,9 @@ def getPosition():
         locat = droid.readLocation()
         if 'gps' in locat.result:
             try:
-                lat = str(locat.result['gps']['latitude'])
                 lon = str(locat.result['gps']['longitude'])
-                wysoko = str(locat.result['gps']['altitude'])
+                lat = str(locat.result['gps']['latitude'])
+                wysoko = int(locat.result['gps']['altitude'])
 
             except Exception as p:
                 print ('Failure: ', p)
@@ -399,9 +406,9 @@ def getPosition():
 
                 licznikGps = licznikGps+1
                 if licznikGps==4:
-                    koordArr.append(lat[:11])
                     koordArr.append(lon[:11])
-                    koordArr.append(wysoko[:4])
+                    koordArr.append(lat[:11])
+                    koordArr.append(wysoko)
                     koordArr.append(licznikGps)
 
                     droid.stopLocating()
