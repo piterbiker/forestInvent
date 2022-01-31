@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS "INW_PJ_TYPY_LASU"  (
 	"SKROT" TEXT NOT NULL UNIQUE, 
 	"RODZAJ" TEXT NOT NULL CHECK ("RODZAJ" in ('N', 'W', 'G')), 
 	"OPIS" TEXT NOT NULL, 
+	"ZYZNOSC" INTEGER NOT NULL DEFAULT 1, 
+	"WILGOTNOSC" INTEGER NOT NULL DEFAULT 1, 
+	"REGIEL" INTEGER NOT NULL DEFAULT 1, 
 	PRIMARY KEY("ID" AUTOINCREMENT)	 
    );
 CREATE TABLE IF NOT EXISTS "INW_PJ_POMIARY" (
@@ -67,27 +70,41 @@ CREATE TABLE IF NOT EXISTS "INW_PJ_DRZEWA" (
 	FOREIGN KEY("GATUNEK") REFERENCES "INW_PJ_GATUNKI"("SKROT"),
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('1','BMwyż','W','Bór mieszany wyżynny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('2','LMwyż','W','Las mieszany wyżynny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('3','Lwyż','W','Las wyżynny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('4','BG','G','Bór górski');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('5','BMG','G','Bór mieszany górski');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('6','LMG','G','Las mieszany górski');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('7','LG','G','Las górski');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('8','LłG','G','Las łęgowy górski');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('9','Bs','N','Bór suchy');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('10','Bśw','N','Bór świeży');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('11','Bw','N','Bór wilgotny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('12','Bb','N','Bór bagienny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('13','BMb','N','Bór mieszany bagienny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('14','BMw','N','Bór mieszany wilgotny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('15','BMśw','N','Bór mieszany świeży');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('16','LMb','N','Las mieszany bagienny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('17','LMw','N','Las mieszany wilgotny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('18','LMśw','N','Las mieszany świeży');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('19','Ol','N','Ols');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('20','Lw','N','Las wilgotny');
-INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS") values ('21','Lśw','N','Las świeży');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('1','BMwyżw','W','Bór mieszany wyżynny wilgotny','2','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('2','LMwyżw','W','Las mieszany wyżynny wilgotny','3','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('3','Lwyżw','W','Las wyżynny wilgotny','4','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('4','BGśw','G','Bór górski świeży','2','1','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('5','BMGśw','G','Bór mieszany górski świeży','2','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('6','LMGśw','G','Las mieszany górski świeży','2','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('7','LGśw','G','Las górski świeży','2','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('8','LłG','G','Las łęgowy górski','2','5','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('9','Bs','N','Bór suchy','1','1','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('10','Bśw','N','Bór świeży','1','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('11','Bw','N','Bór wilgotny','1','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('12','Bb','N','Bór bagienny','1','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('13','BMb','N','Bór mieszany bagienny','2','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('14','BMw','N','Bór mieszany wilgotny','2','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('15','BMśw','N','Bór mieszany świeży','2','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('16','LMb','N','Las mieszany bagienny','3','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('17','LMw','N','Las mieszany wilgotny','3','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('18','LMśw','N','Las mieszany świeży','3','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('19','Ol','N','Ols','4','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('20','Lw','N','Las wilgotny','4','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('21','Lśw','N','Las świeży','4','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('23','Lł','N','Las łęgowy','5','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('24','OlJ','N','Ols jesionowy','5','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('25','Lłwyż','W','Las łęgowy wyżynny','5','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('26','BMwyżśw','W','Bór mieszany wyżynny świeży','2','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('27','LMwyżśw','W','Las mieszany wyżynny świeży','3','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('28','Lwyżśw','W','Las wyżynny świeży','4','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('29','OlJwyż','W','Ols jesionowy wyżynny','5','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('30','BGw','G','Bór górski wilgotny','3','1','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('31','BMGw','G','Bór mieszany górski wilgotny','3','2','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('32','LMGw','G','Las mieszany górski wilgotny','3','3','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('33','LGw','G','Las górski wilgotny','3','4','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('34','OlJG','G','Ols jesionowy górski','3','5','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('35','BGb','G','Bór górski bagienny','4','1','1');
+INSERT INTO "INW_PJ_TYPY_LASU" ("ID","SKROT","RODZAJ","OPIS","ZYZNOSC","WILGOTNOSC","REGIEL") VALUES ('36','BMGb','G','Bór mieszany górski bagienny','4','2','1');
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('I',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('II',NULL);
 INSERT INTO "EGB_OZKTYPES" ("ENUMERATION","DESCRIPTION") VALUES ('III',NULL);
@@ -203,4 +220,15 @@ join INW_PJ_POMIARY p on d.POMIAR_ID = p.ID
 join INW_PJ_GATUNKI g on d.GATUNEK = g.SKROT
 left outer join EGB_OZUTYPES o on p.OZU = o.ENUMERATION
 left outer join INW_PJ_TYPY_LASU t on p.TYP_LASU = t.SKROT;
+create view INW_PJ_TYPY_LASU_V as 
+SELECT
+    REGIEL, 
+    RODZAJ,
+    SKROT,
+    OPIS,
+    ZYZNOSC, 	
+    WILGOTNOSC
+FROM
+    INW_PJ_TYPY_LASU
+order by REGIEL, RODZAJ, ZYZNOSC, WILGOTNOSC;
 COMMIT;
