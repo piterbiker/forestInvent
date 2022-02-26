@@ -1,3 +1,4 @@
+# http://www.mithril.com.au/android/doc/UiFacade.html#clearOptionsMenu
 # aplikacja w trypie bez niezaleznym
 
 # lokalna sciezka do plikow bazy danych 
@@ -212,6 +213,12 @@ def add_tree(db):
     licznik=numberItem('Liczba drzew', 'dla wybranego gatunku', '10')
 
     for i in range(1, licznik+1):
+
+        droid.dialogCreateAlert('Rozpocznij nowy pomiar', gatunekz)
+        droid.dialogSetPositiveButtonText('Start')
+        droid.dialogShow()
+        response=droid.dialogGetResponse().result
+        droid.dialogDismiss()
 
         lokalizacjaArr = getPosition()
 
